@@ -31,20 +31,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <section>
-            <SignedOut>
+    // <ClerkProvider>
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <section>
+          {/* <SignedOut>
               <SignInButton />
               <SignUpButton />
             </SignedOut>
-            <SignedIn>{children}</SignedIn>
-          </section>
-        </body>
-      </html>
-    </ClerkProvider>
+            <SignedIn></SignedIn> */}
+          {children}
+        </section>
+      </body>
+    </html>
+    // </ClerkProvider>
   );
 }
