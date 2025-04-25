@@ -16,6 +16,14 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const multer_1 = __importDefault(require("multer"));
 const bullmq_1 = require("bullmq");
+const dotenv_1 = __importDefault(require("dotenv"));
+const qdrant_1 = require("@langchain/qdrant");
+const openai_1 = require("@langchain/openai");
+const openai_2 = __importDefault(require("openai"));
+dotenv_1.default.config();
+const client = new openai_2.default({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 const myQueue = new bullmq_1.Queue("upload-pdf", {
     connection: {
         host: "localhost",
@@ -48,4 +56,32 @@ app.post("/upload/pdf", upload.single("pdf"), function (req, res) {
         });
     });
 });
+app.get("/chat-pdf", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userQuery = req.query.message;
+    const embeddings = new openai_1.OpenAIEmbeddings({
+        model: "text-embedding-3-small",
+        apiKey: process.env.OPENAI_API_KEY,
+    });
+    const vectorStore = yield qdrant_1.QdrantVectorStore.fromExistingCollection(embeddings, {
+        url: "http://localhost:6333",
+        collectionName: "pdf-testing",
+    });
+    const retriever = vectorStore.asRetriever({ k: 2 });
+    const result = yield retriever.invoke(userQuery);
+    const SYSTEM_PROMPT = `you are a helpful AI Assistant whose work to response on the user query based on the given CONTEXT.
+  CONTEXT :
+  ${JSON.stringify(result)}
+  `;
+    const chatResponse = client.chat.completions.create({
+        model: "gpt-4.1",
+        messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content: userQuery },
+        ],
+    });
+    res.status(200).json({
+        message: (yield chatResponse).choices[0].message.content,
+        docs: result,
+    });
+}));
 app.listen(8000, () => console.log(`Port is running on 8000`));

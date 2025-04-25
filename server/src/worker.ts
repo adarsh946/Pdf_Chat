@@ -1,8 +1,9 @@
 import { Worker } from "bullmq";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
-import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { QdrantVectorStore } from "@langchain/qdrant";
 import { OpenAIEmbeddings } from "@langchain/openai";
+import dotenv from "dotenv";
+dotenv.config();
 
 const worker = new Worker(
   "upload-pdf",
@@ -14,20 +15,11 @@ const worker = new Worker(
     const loader = new PDFLoader(data.path);
     const docs = await loader.load();
 
-    // console.log(docs);
-    // split it into chunks
-
-    // const textSplitter = new RecursiveCharacterTextSplitter({
-    //   chunkSize: 100,
-    //   chunkOverlap: 20,
-    // });
-    // const texts = await textSplitter.splitText(docs.toString());
-    // console.log(texts[0]);
-
     // store it in qdrant vector store
 
     const embeddings = new OpenAIEmbeddings({
       model: "text-embedding-3-small",
+      apiKey: process.env.OPENAI_API_KEY,
     });
 
     const vectorStore = await QdrantVectorStore.fromExistingCollection(
