@@ -13,6 +13,8 @@
 
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useState, useRef, useEffect } from "react";
 
 // interface Doc {
@@ -51,7 +53,10 @@ export default function Home() {
       `http://localhost:8000/chat-pdf?message=${input}`
     );
     const data = await response.json();
-    setMessages((prev) => [...prev, { role: "user", content: data?.message }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: data?.message },
+    ]);
 
     // const aiMessage = { sender: "ai", text: data.reply };
     // setMessages((prev) => [...prev, aiMessage]);
@@ -65,11 +70,13 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen p-4">
       {/* Chat area */}
-      <div className="flex-1 overflow-y-auto mb-4">
+      <div className="flex-1 overflow-y-auto mb-4 ">
         {messages.map((m, i) => (
           <div
             key={i}
-            className={`mb-2 ${m.role === "user" ? "text-right" : "text-left"}`}
+            className={`mb-2 ${
+              m.role === "user" ? "text-right" : "text-left max-w-[70%]"
+            }`}
           >
             <div
               className={`inline-block px-4 py-2 rounded-lg ${
@@ -94,7 +101,7 @@ export default function Home() {
 
       {/* Input area */}
       <div className="flex">
-        <input
+        <Input
           type="text"
           className="flex-1 border rounded-l-lg p-2"
           value={input}
@@ -102,12 +109,13 @@ export default function Home() {
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
           placeholder="Type your message..."
         />
-        <button
+        <Button
+          variant={"outline"}
           className="bg-blue-500 text-white px-4 rounded-r-lg"
           onClick={sendMessage}
         >
           Send
-        </button>
+        </Button>
       </div>
     </div>
   );
