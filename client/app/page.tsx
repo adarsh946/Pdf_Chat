@@ -1,3 +1,4 @@
+import ChatInterface from "./components/chatInterface";
 import FileUpload from "./components/fileUpload";
 
 export default function Home() {
@@ -6,7 +7,9 @@ export default function Home() {
       <div className="w-[30vw] min-h-screen flex items-center justify-center">
         <FileUpload />
       </div>
-      <div className="w-[70vw] min-h-screen">2</div>
+      <div className="w-[70vw] min-h-screen">
+        <ChatInterface />
+      </div>
     </div>
   );
 }
